@@ -1,0 +1,42 @@
+.team-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+
+  label {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #7fd7e8;
+  }
+
+  select {
+    background: rgba(10, 18, 30, 0.75);
+    border: 1px solid rgba(34, 211, 238, 0.35);
+    border-radius: 8px;
+    color: #e6faff;
+    padding: 10px 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus {
+      border-color: #22d3ee;
+      box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.25);
+    }
+
+    option {
+      background: #0a121e;
+      color: #e6faff;
+    }
+
+    option:disabled {
+      color: #445;
+    }
+  }
+}

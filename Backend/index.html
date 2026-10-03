@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPL Match Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-deep:    #060d1a;
+            --bg-card:    #0d1f35;
+            --bg-input:   #0a1828;
+            --border:     #1a3a5c;
+            --accent:     #00d4ff;
+            --accent2:    #ff6b35;
+            --text:       #e8f4ff;
+            --muted:      #5a8aad;
+            --success:    #00e5a0;
+            --radius:     12px;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 16px 60px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Subtle grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Glow blob */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -120px; left: 50%; transform: translateX(-50%);
+            width: 700px; height: 400px;
+            background: radial-gradient(ellipse, rgba(0,212,255,0.07) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Header ── */
+        header {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .badge {
+            display: inline-block;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent);
+            border: 1px solid rgba(0,212,255,0.3);
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            background: rgba(0,212,255,0.05);
+        }
+
+        h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(2rem, 6vw, 3.4rem);
+            font-weight: 700;
+            letter-spacing: 1px;
+            line-height: 1.1;
+            color: var(--text);
+        }
+
+        h1 span { color: var(--accent); }
+
+        .subtitle {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--muted);
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Card ── */
+        .card {
+            position: relative;
+            z-index: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px 32px;
+            width: 100%;
+            max-width: 520px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,212,255,0.05) inset;
+        }
+
+        /* ── Section labels ── */
+        .section-label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        /* ── VS row ── */
+        .teams-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: end;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .vs-badge {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent2);
+            text-align: center;
+            padding-bottom: 12px;
+        }
+
+        /* ── Field group ── */
+        .field-group { display: flex; flex-direction: column; }
+
+        /* ── Inputs / Selects ── */
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-input);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'Exo 2', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a8aad' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0,212,255,0.12);
+        }
+
+        select option { background: #0d1f35; }
+
+        /* ── Divider ── */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 24px 0;
+        }
+
+        /* ── Optional row ── */
+        .optional-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        /* ── Predict button ── */
+        .predict-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #0099cc 0%, #00d4ff 100%);
+            color: #060d1a;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+            box-shadow: 0 4px 24px rgba(0,212,255,0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .predict-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0,212,255,0.4);
+        }
+
+        .predict-btn:active:not(:disabled) { transform: translateY(0); }
+
+        .predict-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .predict-btn .spinner {
+            display: none;
+            width: 18px; height: 18px;
+            border: 2px solid rgba(0,0,0,0.3);
+            border-top-color: #060d1a;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto;
+        }
+
+        .predict-btn.loading .btn-text { display: none; }
+        .predict-btn.loading .spinner { display: block; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Error ── */
+        .error-box {
+            margin-top: 20px;
+            background: rgba(255, 80, 80, 0.08);
+            border: 1px solid rgba(255,80,80,0.3);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            font-size: 13px;
+            color: #ff8080;
+            display: none;
+        }
+
+        /* ── Result ── */
+        .result-box {
+            margin-top: 24px;
+            background: rgba(0,212,255,0.04);
+            border: 1px solid rgba(0,212,255,0.2);
+            border-radius: 16px;
+            padding: 24px;
+            display: none;
+            animation: fadeUp 0.4s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-winner {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .result-winner-label {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 20px;
+        }
+
+        .result-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .meta-chip {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+
+        .meta-chip .chip-label {
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .meta-chip .chip-value {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .confidence-high   { color: var(--success) !important; }
+        .confidence-medium { color: #ffc93c !important; }
+        .confidence-low    { color: var(--accent2) !important; }
+
+        /* ── Prob bars ── */
+        .prob-section { margin-top: 20px; }
+
+        .prob-label {
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        .prob-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .prob-team {
+            width: 160px;
+            font-size: 13px;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-shrink: 0;
+        }
+
+        .prob-bar-wrap {
+            flex: 1;
+            height: 6px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .prob-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0099cc, #00d4ff);
+            border-radius: 4px;
+            transition: width 0.7s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .prob-pct {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent);
+            width: 38px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* ── Footer ── */
+        footer {
+            position: relative;
+            z-index: 1;
+            margin-top: 40px;
+            font-size: 12px;
+            color: var(--muted);
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="badge">🏏 IPL  · AI Powered</div>
+    <h1>Match <span>Predictor</span></h1>
+    <p class="subtitle">ML model · Live weather · News sentiment</p>
+</header>
+
+<div class="card">
+
+    <!-- Teams -->
+    <div class="section-label">Select Teams</div>
+    <div class="teams-row">
+        <div class="field-group">
+            <div class="section-label" style="font-size:10px; margin-bottom:6px;">Team 1</div>
+            <select id="team1">
+                <option>Mumbai Indians</option>
+                <option>Chennai Super Kings</option>
+                <option>Royal Challengers Bengaluru</option>
+                <option>Kolkata Knight Riders</option>
+                <option>Delhi Capitals</option>
+                <option>Punjab Kings</option>
+                <option>Rajasthan Royals</option>
+                <option>Sunrisers Hyderabad</option>
+                <option>Lucknow Super Giants</option>
+                <option>Gujarat Titans</option>
+            </select>
+        </div>
+
+        <div class="vs-badge">VS</div>
+
+        <div class="field-group">
+            <div class="section-label" style="font-size:10px; margin-bottom:6px;">Team 2</div>
+            <select id="team2">
+                <option>Chennai Super Kings</option>
+                <option>Mumbai Indians</option>
+                <option>Royal Challengers Bengaluru</option>
+                <option>Kolkata Knight Riders</option>
+                <option>Delhi Capitals</option>
+                <option>Punjab Kings</option>
+                <option>Rajasthan Royals</option>
+                <option>Sunrisers Hyderabad</option>
+                <option>Lucknow Super Giants</option>
+                <option>Gujarat Titans</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Venue -->
+    <div class="field-group" style="margin-bottom: 24px;">
+        <div class="section-label">Venue</div>
+        <select id="venue">
+            <option>Wankhede Stadium, Mumbai</option>
+            <option>Eden Gardens, Kolkata</option>
+            <option>M Chinnaswamy Stadium, Bengaluru</option>
+            <option>MA Chidambaram Stadium, Chepauk, Chennai</option>
+            <option>Arun Jaitley Stadium, Delhi</option>
+            <option>Narendra Modi Stadium, Ahmedabad</option>
+            <option>Punjab Cricket Association IS Bindra Stadium, Mohali</option>
+            <option>Rajiv Gandhi International Stadium, Uppal, Hyderabad</option>
+            <option>BRSABV Ekana Cricket Stadium, Lucknow</option>
+            <option>Sawai Mansingh Stadium, Jaipur</option>
+        </select>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Toss (optional) -->
+    <div class="section-label">Toss Details <span style="color:#2a4a6a; font-weight:400;">(optional)</span></div>
+    <div class="optional-row">
+        <div class="field-group">
+            <div class="section-label" style="font-size:10px; margin-bottom:6px;">Toss Winner</div>
+            <select id="toss_winner">
+                <option value="">— None —</option>
+                <option>Mumbai Indians</option>
+                <option>Chennai Super Kings</option>
+                <option>Royal Challengers Bengaluru</option>
+                <option>Kolkata Knight Riders</option>
+                <option>Delhi Capitals</option>
+                <option>Punjab Kings</option>
+                <option>Rajasthan Royals</option>
+                <option>Sunrisers Hyderabad</option>
+                <option>Lucknow Super Giants</option>
+                <option>Gujarat Titans</option>
+            </select>
+        </div>
+        <div class="field-group">
+            <div class="section-label" style="font-size:10px; margin-bottom:6px;">Decision</div>
+            <select id="toss_decision">
+                <option value="">— None —</option>
+                <option value="bat">Bat</option>
+                <option value="field">Field</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Button -->
+    <button class="predict-btn" id="predictBtn" onclick="predict()">
+        <span class="btn-text">⚡ Predict Winner</span>
+        <span class="spinner"></span>
+    </button>
+
+    <!-- Error -->
+    <div class="error-box" id="errorBox"></div>
+
+    <!-- Result -->
+    <div class="result-box" id="resultBox">
+        <div class="result-winner" id="resWinner"></div>
+        <div class="result-winner-label">Predicted Winner</div>
+
+        <div class="result-meta">
+            <div class="meta-chip">
+                <div class="chip-label">Confidence</div>
+                <div class="chip-value" id="resConfidence"></div>
+            </div>
+            <div class="meta-chip">
+                <div class="chip-label">Weather</div>
+                <div class="chip-value" id="resWeather"></div>
+            </div>
+            <div class="meta-chip">
+                <div class="chip-label">Temperature</div>
+                <div class="chip-value" id="resTemp"></div>
+            </div>
+            <div class="meta-chip">
+                <div class="chip-label">Humidity</div>
+                <div class="chip-value" id="resHumidity"></div>
+            </div>
+        </div>
+
+        <div class="prob-section" id="probSection"></div>
+    </div>
+
+</div>
+
+<footer>Powered by ML · OpenWeather · GNews · LLaMA 3</footer>
+
+<script>
+    const API_URL = "http://127.0.0.1:5000/predict";
+
+    async function predict() {
+        const btn = document.getElementById("predictBtn");
+        const errorBox = document.getElementById("errorBox");
+        const resultBox = document.getElementById("resultBox");
+
+        // Validate same team
+        const t1 = document.getElementById("team1").value;
+        const t2 = document.getElementById("team2").value;
+        if (t1 === t2) {
+            showError("Please select two different teams.");
+            return;
+        }
+
+        // Loading state
+        errorBox.style.display = "none";
+        resultBox.style.display = "none";
+        btn.classList.add("loading");
+        btn.disabled = true;
+
+        const payload = {
+            team1: t1,
+            team2: t2,
+            venue: document.getElementById("venue").value,
+            toss_winner: document.getElementById("toss_winner").value,
+            toss_decision: document.getElementById("toss_decision").value
+        };
+
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error(`Server error: ${response.status}`);
+
+            const result = await response.json();
+
+            if (result.error) throw new Error(result.error);
+
+            renderResult(result, t1, t2);
+
+        } catch (err) {
+            showError(err.message || "Could not connect to the prediction server. Make sure Flask is running on port 5000.");
+        } finally {
+            btn.classList.remove("loading");
+            btn.disabled = false;
+        }
+    }
+
+    function renderResult(result, t1, t2) {
+        document.getElementById("resWinner").textContent = "🏆 " + result.predicted_winner;
+
+        const confEl = document.getElementById("resConfidence");
+        confEl.textContent = result.confidence;
+        confEl.className = "chip-value confidence-" + result.confidence.toLowerCase();
+
+        const w = result.weather || {};
+        document.getElementById("resWeather").textContent   = w.weather      || "—";
+        document.getElementById("resTemp").textContent      = w.temperature != null ? w.temperature + " °C" : "—";
+        document.getElementById("resHumidity").textContent  = w.humidity     != null ? w.humidity + " %" : "—";
+
+        // Probability bars
+        const probSection = document.getElementById("probSection");
+        const probs = result.probabilities || {};
+        const teams = Object.keys(probs);
+
+        if (teams.length > 0) {
+            // Show only the two playing teams
+            const relevant = [t1, t2].filter(t => probs[t] != null);
+            if (relevant.length === 0) { probSection.innerHTML = ""; }
+            else {
+                let html = '<div class="prob-label">Win Probability</div>';
+                relevant.forEach(team => {
+                    const pct = (probs[team] * 100).toFixed(1);
+                    html += `
+                        <div class="prob-row">
+                            <div class="prob-team">${team}</div>
+                            <div class="prob-bar-wrap">
+                                <div class="prob-bar-fill" style="width:0%" data-target="${pct}"></div>
+                            </div>
+                            <div class="prob-pct">${pct}%</div>
+                        </div>`;
+                });
+                probSection.innerHTML = html;
+
+                // Animate bars after render
+                requestAnimationFrame(() => {
+                    probSection.querySelectorAll(".prob-bar-fill").forEach(bar => {
+                        bar.style.width = bar.dataset.target + "%";
+                    });
+                });
+            }
+        }
+
+        const resultBox = document.getElementById("resultBox");
+        resultBox.style.display = "block";
+        // Re-trigger animation
+        resultBox.style.animation = "none";
+        void resultBox.offsetWidth;
+        resultBox.style.animation = "";
+    }
+
+    function showError(msg) {
+        const box = document.getElementById("errorBox");
+        box.textContent = "⚠ " + msg;
+        box.style.display = "block";
+    }
+</script>
+
+</body>
+</html>

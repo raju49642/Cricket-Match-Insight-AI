@@ -1,0 +1,31 @@
+<div class="app-shell">
+  <app-intro-animation *ngIf="view === 'intro'" (introComplete)="onIntroComplete()"></app-intro-animation>
+
+  <ng-container *ngIf="view !== 'intro'">
+    <header class="app-header">
+      <div class="title">HYBRID IPL</div>
+      <div class="subtitle-main">PREDICTION ENGINE</div>
+      <p class="tagline">AI-powered cricket match prediction</p>
+    </header>
+
+    <main class="app-main">
+      <app-prediction-form
+        *ngIf="view === 'form'"
+        (formSubmit)="onFormSubmit($event)"
+      ></app-prediction-form>
+
+      <app-analysis-animation
+        *ngIf="view === 'analyzing'"
+        [apiComplete]="apiComplete"
+        (analysisComplete)="onAnalysisComplete()"
+      ></app-analysis-animation>
+
+      <app-prediction-result
+        *ngIf="view === 'result'"
+        [result]="result"
+        [errorMessage]="errorMessage"
+        (reset)="onReset()"
+      ></app-prediction-result>
+    </main>
+  </ng-container>
+</div>

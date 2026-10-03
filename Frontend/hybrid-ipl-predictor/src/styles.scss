@@ -1,0 +1,42 @@
+// ==========================================================
+// Global styles / design tokens for the Hybrid IPL Prediction
+// Engine. Dark, futuristic, cyan + orange accent palette.
+// ==========================================================
+
+:root {
+  --color-bg: #05070d;
+  --color-cyan: #22d3ee;
+  --color-orange: #ff8c3c;
+  --color-text: #e6faff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Exo 2', sans-serif;
+
+  // Subtle futuristic grid backdrop - kept faint so it never overpowers content.
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.05) 1px, transparent 1px);
+  background-size: 42px 42px;
+  background-attachment: fixed;
+}
+
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.35);
+}

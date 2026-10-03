@@ -1,0 +1,45 @@
+.app-shell {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.app-header {
+  text-align: center;
+  padding: 48px 16px 12px;
+
+  .title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 2.2rem;
+    letter-spacing: 0.25em;
+    color: #e6faff;
+    text-shadow: 0 0 20px rgba(34, 211, 238, 0.35);
+  }
+
+  .subtitle-main {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.4em;
+    color: #ff8c3c;
+    margin-top: 2px;
+  }
+
+  .tagline {
+    margin-top: 10px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.85rem;
+    color: #5f7c8c;
+    letter-spacing: 0.05em;
+  }
+}
+
+.app-main {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px 60px;
+}

@@ -1,0 +1,54 @@
+<div class="prediction-form">
+  <div class="team-row">
+    <app-team-selector
+      label="Team 1"
+      [teams]="teams"
+      [selectedTeam]="team1"
+      [disabledTeam]="team2"
+      (teamChange)="onTeam1Change($event)"
+    ></app-team-selector>
+
+    <div class="vs">VS</div>
+
+    <app-team-selector
+      label="Team 2"
+      [teams]="teams"
+      [selectedTeam]="team2"
+      [disabledTeam]="team1"
+      (teamChange)="onTeam2Change($event)"
+    ></app-team-selector>
+  </div>
+
+  <p class="error" *ngIf="sameTeamError">Team 1 and Team 2 must be different.</p>
+
+  <div class="field">
+    <label>Venue</label>
+    <select [(ngModel)]="venue">
+      <option value="" disabled>Select venue</option>
+      <option *ngFor="let v of venues" [value]="v">{{ v }}</option>
+    </select>
+  </div>
+
+  <div class="toss-row">
+    <div class="field">
+      <label>Toss Winner <span class="optional">(optional)</span></label>
+      <select [(ngModel)]="tossWinner" [disabled]="availableTossWinners.length === 0">
+        <option value="">None selected</option>
+        <option *ngFor="let t of availableTossWinners" [value]="t">{{ t }}</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Toss Decision <span class="optional">(optional)</span></label>
+      <select [(ngModel)]="tossDecision">
+        <option value="">None selected</option>
+        <option value="Bat">Bat</option>
+        <option value="Field">Field</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="predict-btn" [disabled]="!isFormValid" (click)="onSubmit()">
+    ⚡ PREDICT MATCH
+  </button>
+</div>

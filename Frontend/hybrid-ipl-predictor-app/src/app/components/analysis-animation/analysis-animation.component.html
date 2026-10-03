@@ -1,0 +1,14 @@
+<div class="analysis-container">
+  <div class="scan-line"></div>
+
+  <ul class="stage-list">
+    <li
+      *ngFor="let stage of stages; let i = index"
+      [class.active]="i === currentIndex"
+      [class.done]="i < currentIndex"
+    >
+      <span class="dot"></span>
+      {{ stage.label }}
+    </li>
+  </ul>
+</div>

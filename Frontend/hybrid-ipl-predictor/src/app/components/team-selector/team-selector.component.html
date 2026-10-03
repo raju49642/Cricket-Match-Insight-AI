@@ -1,0 +1,9 @@
+<div class="team-selector">
+  <label>{{ label }}</label>
+  <select [ngModel]="selectedTeam" (ngModelChange)="onChange($event)">
+    <option value="" disabled>Select team</option>
+    <option *ngFor="let team of teams" [value]="team" [disabled]="team === disabledTeam">
+      {{ team }}
+    </option>
+  </select>
+</div>

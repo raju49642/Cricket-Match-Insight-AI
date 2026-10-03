@@ -1,0 +1,51 @@
+<div class="result-container" *ngIf="result">
+  <div class="winner-block">
+    <div class="label">PREDICTED WINNER</div>
+    <div class="winner">🏆 {{ result.predicted_winner }}</div>
+    <div class="confidence">CONFIDENCE: {{ result.confidence }}</div>
+  </div>
+
+  <div class="bars">
+    <div class="bar-row" *ngFor="let bar of bars">
+      <div class="bar-label">
+        <span>{{ bar.team }}</span>
+        <span>{{ bar.value }}%</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" [style.width.%]="bar.value"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="weather-block" *ngIf="result.weather">
+    <div class="weather-item">
+      <span class="w-label">Weather</span>
+      <span class="w-value">{{ result.weather.weather }}</span>
+    </div>
+    <div class="weather-item">
+      <span class="w-label">Temperature</span>
+      <span class="w-value">{{ result.weather.temperature }}°C</span>
+    </div>
+    <div class="weather-item">
+      <span class="w-label">Humidity</span>
+      <span class="w-value">{{ result.weather.humidity }}%</span>
+    </div>
+  </div>
+
+  <div class="insights-block" *ngIf="result.insights && result.insights.length">
+    <button class="insights-toggle" (click)="toggleInsights()">
+      AI INSIGHTS {{ insightsOpen ? '▲' : '▼' }}
+    </button>
+    <ul class="insights-list" *ngIf="insightsOpen">
+      <li *ngFor="let insight of result.insights">{{ insight }}</li>
+    </ul>
+  </div>
+
+  <button class="predict-again-btn" (click)="onReset()">Predict Another Match</button>
+</div>
+
+<div class="error-container" *ngIf="errorMessage">
+  <div class="error-icon">⚠</div>
+  <div class="error-text">{{ errorMessage }}</div>
+  <button class="predict-again-btn" (click)="onReset()">Try Again</button>
+</div>

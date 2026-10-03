@@ -1,0 +1,35 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python environments and generated files
+**/.venv/
+**/venv/
+**/__pycache__/
+*.py[cod]
+
+# Trained models and generated data
+*.pkl
+*.pickle
+*.h5
+*.pth
+*.pt
+*.joblib
+*.onnx
+models/
+checkpoints/
+
+# Node/Angular dependencies and builds
+**/node_modules/
+**/.angular/
+**/dist/
+
+# Local tooling and IDE files
+**/.kilo/
+**/.vscode/
+.idea/
+*.swp
+*.swo
+Thumbs.db
+.DS_Store
